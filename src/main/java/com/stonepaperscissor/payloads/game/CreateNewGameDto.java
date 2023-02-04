@@ -1,4 +1,4 @@
-package com.stonepaperscissor.payloads;
+package com.stonepaperscissor.payloads.game;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,4 +1,4 @@
-package com.stonepaperscissor.payloads;
+package com.stonepaperscissor.payloads.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayGameResponse {
-	private String winner;
+	private String winnerResponse;
 }

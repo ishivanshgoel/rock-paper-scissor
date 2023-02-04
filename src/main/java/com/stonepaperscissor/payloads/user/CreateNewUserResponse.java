@@ -1,4 +1,4 @@
-package com.stonepaperscissor.payloads;
+package com.stonepaperscissor.payloads.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CreateNewGameResponse {
-	private String gameId;
+public class CreateNewUserResponse {
+	private String userId;
 }
