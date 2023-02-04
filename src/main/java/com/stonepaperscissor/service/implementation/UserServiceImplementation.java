@@ -3,6 +3,7 @@ package com.stonepaperscissor.service.implementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.stonepaperscissor.entity.Player;
 import com.stonepaperscissor.payloads.user.CreateNewUserDto;
 import com.stonepaperscissor.payloads.user.CreateNewUserResponse;
 import com.stonepaperscissor.repository.UserRepository;
@@ -16,6 +17,7 @@ public class UserServiceImplementation implements UserService {
 	
 	@Override
 	public CreateNewUserResponse registerNewUser(CreateNewUserDto createNewUserDto) {
-		return new CreateNewUserResponse();
+		String username = createNewUserDto.getName();
+		return new CreateNewUserResponse(this.userRepository.addNewUser(new Player(username)));
 	}
 }

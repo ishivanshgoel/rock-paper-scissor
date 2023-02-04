@@ -27,7 +27,7 @@ public class GameController {
 	 * starts a new game
 	 * @return CreateNewGameResponse
 	 */
-	@PostMapping("/new")
+	@PostMapping("/")
 	public ResponseEntity<CreateNewGameResponse> createNewGame(@RequestBody CreateNewGameDto createNewGameDto) {
 		CreateNewGameResponse createNewGameResponse = this.gameService.createNewGameAndAddUser(createNewGameDto);
 		return new ResponseEntity<CreateNewGameResponse> (createNewGameResponse, HttpStatus.CREATED);
