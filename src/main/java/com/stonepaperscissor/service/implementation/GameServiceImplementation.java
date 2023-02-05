@@ -165,7 +165,8 @@ public class GameServiceImplementation implements GameService {
 	 * generates a random game move (from Rock, Paper or Scissor)
 	 * @return Random (Rock/ Paper/ Scissor)
 	 */
-	private GameMove generateRandomMove() {
+	@Override
+	public GameMove generateRandomMove() {
 		return GameMove.values()[new Random().nextInt(GameMove.values().length)];
 	}	
 	
@@ -173,9 +174,10 @@ public class GameServiceImplementation implements GameService {
 	 * find winner of the game against the game rules
 	 * @param computersMove move made by computer
 	 * @param playersMove move made my external user
-	 * @return 0 if computer wins, 1 if user wins, > 2 if it is a tie
+	 * @return 0 if computer wins, 1 if user wins, >= 2 if it is a tie
 	 */
-	private Integer findWinner(GameMove computersMove, GameMove playersMove) {
+	@Override
+	public Integer findWinner(GameMove computersMove, GameMove playersMove) {
 		if(computersMove == playersMove) return 2; // It is a tie
 
 		if(playersMove == GameMove.Paper) {			

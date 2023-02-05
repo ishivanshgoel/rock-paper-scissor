@@ -1,4 +1,4 @@
-package com.stonepaperscissor.stonepaperscissor;
+package com.stonepaperscissor.test;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,6 +8,9 @@ class StonepaperscissorApplicationTests {
 
 	@Test
 	void contextLoads() {
+		
+		
+		
 	}
 
 }
