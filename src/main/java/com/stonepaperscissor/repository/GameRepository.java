@@ -32,6 +32,7 @@ public class GameRepository {
 	 * @return details corresponding to the game
 	 */
 	public Game getGameDetails(String gameId) {
+		System.out.println("game id " + gameId);
 		return this.gameRecords.get(gameId);
 	}
 	
