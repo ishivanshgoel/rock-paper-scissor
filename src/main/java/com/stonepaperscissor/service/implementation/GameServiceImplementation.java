@@ -3,12 +3,15 @@ package com.stonepaperscissor.service.implementation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.stonepaperscissor.entity.Game;
 import com.stonepaperscissor.entity.GameMove;
 import com.stonepaperscissor.entity.Player;
+import com.stonepaperscissor.exception.GameMoveInvalidException;
 import com.stonepaperscissor.exception.GameNotCompletedExcpetion;
 import com.stonepaperscissor.exception.GameNotFoundException;
 import com.stonepaperscissor.exception.UserNotFoundException;
@@ -20,9 +23,6 @@ import com.stonepaperscissor.payloads.game.PlayGameResponse;
 import com.stonepaperscissor.repository.GameRepository;
 import com.stonepaperscissor.repository.UserRepository;
 import com.stonepaperscissor.service.GameService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class GameServiceImplementation implements GameService {
@@ -70,7 +70,7 @@ public class GameServiceImplementation implements GameService {
 	
 	@Override
 	public PlayGameResponse playGame(String gameId, PlayGameDto playGameDto) 
-			throws GameNotFoundException, UserNotRegisteredInGameException {
+			throws GameNotFoundException, UserNotRegisteredInGameException, GameMoveInvalidException {
 		
 		logger.info("Play game request received. Game Id: " + gameId);
 		
@@ -83,6 +83,18 @@ public class GameServiceImplementation implements GameService {
 			throw new GameNotFoundException();
 		}
 		
+		// check if the move is valid or not
+		Boolean isValid = false;
+		for (GameMove gameMove : GameMove.values()) {
+	        if (gameMove.name().equals(playGameDto.getMove()))
+	            isValid = true;
+	    }
+		
+		if(!isValid) {
+			logger.error("Game Id: " + gameId + " invalid move.");
+			throw new GameMoveInvalidException();
+		}
+
 		String playerId = playGameDto.getUserId();
 		logger.info("Game Id: " + gameId + " PlayerId: " + playerId);
 		
@@ -99,8 +111,6 @@ public class GameServiceImplementation implements GameService {
 		// generate a random move for computer
 		GameMove computersMove = this.generateRandomMove();
 		logger.info("Game Id: " + gameId + " Computer's move (Randomly generated) : " + computersMove.toString());
-		
-		// TODO: check if the move is valid or not
 		
 		// move entered by external player
 		GameMove playersMove = GameMove.valueOf(playGameDto.getMove());

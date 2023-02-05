@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stonepaperscissor.exception.GameMoveInvalidException;
 import com.stonepaperscissor.exception.GameNotCompletedExcpetion;
 import com.stonepaperscissor.exception.GameNotFoundException;
 import com.stonepaperscissor.exception.UserNotFoundException;
@@ -53,7 +54,7 @@ public class GameController {
 		try {
 			PlayGameResponse playGameResponse = this.gameService.playGame(gameId, playGameDto);	
 			return ResponseEntity.status(HttpStatus.OK).body(playGameResponse);
-		} catch(UserNotRegisteredInGameException | GameNotFoundException e) {
+		} catch(UserNotRegisteredInGameException | GameMoveInvalidException | GameNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiErrorResponse(e.getMessage()));
 		}
 	}
