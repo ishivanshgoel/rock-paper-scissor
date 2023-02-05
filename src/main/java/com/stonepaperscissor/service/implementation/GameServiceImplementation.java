@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import com.stonepaperscissor.entity.Game;
 import com.stonepaperscissor.entity.GameMove;
 import com.stonepaperscissor.entity.Player;
+import com.stonepaperscissor.exception.GameNotCompletedExcpetion;
+import com.stonepaperscissor.exception.GameNotFoundException;
+import com.stonepaperscissor.exception.UserNotFoundException;
+import com.stonepaperscissor.exception.UserNotRegisteredInGameException;
 import com.stonepaperscissor.payloads.game.CreateNewGameDto;
 import com.stonepaperscissor.payloads.game.CreateNewGameResponse;
 import com.stonepaperscissor.payloads.game.PlayGameDto;
@@ -27,10 +31,15 @@ public class GameServiceImplementation implements GameService {
 	private UserRepository userRespository;
 	
 	@Override
-	public CreateNewGameResponse createNewGameAndAddUser(CreateNewGameDto createNewGameDto) {
+	public CreateNewGameResponse createNewGameAndAddUser(CreateNewGameDto createNewGameDto) 
+			throws UserNotFoundException {
 		
 		// get the user id of external player
 		String userId = createNewGameDto.getUserId();
+		
+		if(this.userRespository.isUserRegistered(userId) == false) {
+			throw new UserNotFoundException();
+		}
 		
 		// create a second player (Name = Computer)
 		String computerId = userRespository.addNewUser(new Player("Computer"));
@@ -50,14 +59,25 @@ public class GameServiceImplementation implements GameService {
 	}
 	
 	@Override
-	public PlayGameResponse playGame(String gameId, PlayGameDto playGameDto) {
+	public PlayGameResponse playGame(String gameId, PlayGameDto playGameDto) 
+			throws GameNotFoundException, UserNotRegisteredInGameException {
 		
 		// get the details of game
 		Game game = this.gameRepository.getGameDetails(gameId);
 		
 		// in-case the game does not exist
 		if(game == null) {
-			
+			throw new GameNotFoundException();
+		}
+		
+		String playerId = playGameDto.getUserId();
+		
+		// get the game players to find their userId
+		ArrayList<String> players = game.getPlayers();
+		
+		// when user is not registered in the game
+		if(players.get(1) != playerId) {
+			throw new UserNotRegisteredInGameException();
 		}
 		
 		// generate a random move for computer
@@ -69,11 +89,8 @@ public class GameServiceImplementation implements GameService {
 		// decide the winner against the game rules
 		Integer winner = this.findWinner(computersMove, playersMove);
 		
-		// get the game players to find their userId
-		ArrayList<String> players = game.getPlayers();
-		
 		// mark the game as completed
-		game.setIsCompleted(true);
+		this.gameRepository.markGameCompleted(gameId);
 		
 		// zero means computer is winner
 		if(winner == 0) {
@@ -91,9 +108,28 @@ public class GameServiceImplementation implements GameService {
 		return new PlayGameResponse("Is is a tie");
 	}
 	
+	/***
+	 * generates a random move to simulate computer's turn
+	 * @param gameId unique identifier for game
+	 * @return (Player wins/ Computer wins/ It is a tie)
+	 * @throws GameNotFoundException
+	 */
 	@Override
-	public String getGameWinner(String gameId) {
-		return this.gameRepository.getGameWinnerId(this.userRespository.getNameByUserId(gameId));
+	public String getGameWinner(String gameId) throws GameNotFoundException, GameNotCompletedExcpetion {
+		Game gameDetails = this.gameRepository.getGameDetails(gameId);
+		if(gameDetails == null) {
+			throw new GameNotFoundException();
+		}
+		Boolean isGameCompleted = gameDetails.getIsCompleted();
+		if(!isGameCompleted) {
+			throw new GameNotCompletedExcpetion();
+		}
+		
+		String winner = gameDetails.getWinnerId();
+		if(winner.isEmpty()) {
+			return "It is a tie";
+		}
+		return this.userRespository.getNameByUserId(winner) + " wins";
 	}
 	
 	/**
@@ -105,7 +141,7 @@ public class GameServiceImplementation implements GameService {
 	}	
 	
 	/**
-	 * 
+	 * find winner of the game against the game rules
 	 * @param computersMove move made by computer
 	 * @param playersMove move made my external user
 	 * @return 0 if computer wins, 1 if user wins, > 2 if it is a tie
