@@ -33,7 +33,7 @@ public class UserRepository {
 	 */
 	public String getNameByUserId(String userId) {
 		Player player = this.players.get(userId);
-		return "Shivansh";
+		return player.getName();
 	}
 	
 	/***

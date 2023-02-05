@@ -23,8 +23,13 @@ public class UserController {
 	 * @return CreateNewUserResponse
 	 */
 	@PostMapping("/")
-	public ResponseEntity<CreateNewUserResponse> addUser(@RequestBody CreateNewUserDto createNewUserDto) {
-		CreateNewUserResponse createNewUserResponse = this.userService.registerNewUser(createNewUserDto);
-		return new ResponseEntity<CreateNewUserResponse> (createNewUserResponse, HttpStatus.CREATED);
+	public ResponseEntity<CreateNewUserResponse> addUser(@RequestBody CreateNewUserDto createNewUserDto) 
+			throws Exception {
+		try {
+			CreateNewUserResponse createNewUserResponse = this.userService.registerNewUser(createNewUserDto);
+			return new ResponseEntity<CreateNewUserResponse> (createNewUserResponse, HttpStatus.CREATED);	
+		} catch(Exception e) {
+			throw e;
+		}
 	}
 }

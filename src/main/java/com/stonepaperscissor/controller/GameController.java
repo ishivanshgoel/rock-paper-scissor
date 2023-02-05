@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stonepaperscissor.exception.GameNotCompletedExcpetion;
+import com.stonepaperscissor.exception.GameNotFoundException;
+import com.stonepaperscissor.exception.UserNotFoundException;
+import com.stonepaperscissor.exception.UserNotRegisteredInGameException;
 import com.stonepaperscissor.payloads.game.CreateNewGameDto;
 import com.stonepaperscissor.payloads.game.CreateNewGameResponse;
 import com.stonepaperscissor.payloads.game.PlayGameDto;
@@ -28,20 +32,31 @@ public class GameController {
 	 * @return CreateNewGameResponse
 	 */
 	@PostMapping("/")
-	public ResponseEntity<CreateNewGameResponse> createNewGame(@RequestBody CreateNewGameDto createNewGameDto) {
-		CreateNewGameResponse createNewGameResponse = this.gameService.createNewGameAndAddUser(createNewGameDto);
-		return new ResponseEntity<CreateNewGameResponse> (createNewGameResponse, HttpStatus.CREATED);
+	public ResponseEntity<CreateNewGameResponse> createNewGame(@RequestBody CreateNewGameDto createNewGameDto) 
+			throws UserNotFoundException {
+		try {
+			CreateNewGameResponse createNewGameResponse = this.gameService.createNewGameAndAddUser(createNewGameDto);
+			return new ResponseEntity<CreateNewGameResponse> (createNewGameResponse, HttpStatus.CREATED);	
+		} catch(UserNotFoundException e) {
+			throw e;
+		}
 	}
 	
 	/**
 	 * @param gameId unique identifier for the game
 	 * @param playGameDto parameters required as input to play the game
 	 * @return PlayGameResponse
+	 * @throws UserNotRegisteredInGameException, GameNotFoundException 
 	 */
 	@PostMapping("/{gameId}/play")
-	public ResponseEntity<PlayGameResponse> playGame(@PathVariable String gameId, @RequestBody PlayGameDto playGameDto) {
-		PlayGameResponse playGameResponse = this.gameService.playGame(gameId, playGameDto);
-		return new ResponseEntity<PlayGameResponse> (playGameResponse, HttpStatus.OK);
+	public ResponseEntity<PlayGameResponse> playGame(@PathVariable String gameId, @RequestBody PlayGameDto playGameDto) 
+			throws UserNotRegisteredInGameException, GameNotFoundException {
+		try {
+			PlayGameResponse playGameResponse = this.gameService.playGame(gameId, playGameDto);
+			return new ResponseEntity<PlayGameResponse> (playGameResponse, HttpStatus.OK);	
+		} catch(UserNotRegisteredInGameException | GameNotFoundException e) {
+			throw e;
+		}
 	}
 	
 	/**
@@ -49,8 +64,13 @@ public class GameController {
 	 * @return returns the winner of game (Player wins/ Computer wins/ It is a tie).
 	 */
 	@GetMapping("/{gameId}/winner")
-	public ResponseEntity<String> getWinnerOfGame(@PathVariable String gameId) {
-		String winner = this.gameService.getGameWinner(gameId);
-		return new ResponseEntity<String> (winner, HttpStatus.OK);
+	public ResponseEntity<String> getWinnerOfGame(@PathVariable String gameId) 
+			throws GameNotFoundException, GameNotCompletedExcpetion {
+		try {
+			String winner = this.gameService.getGameWinner(gameId);
+			return new ResponseEntity<String> (winner, HttpStatus.OK);	
+		} catch(GameNotCompletedExcpetion | GameNotFoundException e) {
+			throw e;
+		}
 	}
 }

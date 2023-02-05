@@ -36,6 +36,16 @@ public class GameRepository {
 	}
 	
 	/**
+	 * marks game as completed
+	 * @param gameId unique identifier for game
+	 */
+	public void markGameCompleted(String gameId) {
+		Game game = this.gameRecords.get(gameId);
+		game.setIsCompleted(true);
+		this.gameRecords.put(gameId, game);
+	}
+	
+	/**
 	 * updates the winner of game
 	 * @param gameId unique identifier for game
 	 * @param winnerId unique identifier for user, represents the game winner here
